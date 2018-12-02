@@ -16,18 +16,18 @@ load dat.mat
 volume = 1024;
 
 %%% choose parameter
-alpha = 0.0125;
-epochs = 300;
+alpha = 0.1;
+epochs = 600;
 J = zeros(1, epochs);
 mini_batch = 80;
-probab = 0.8;
+probab = 0.5;
 Acc = zeros(1, trainSize / mini_batch);
 
 %%% define network structure
 structure = [1024 0
              0 256
              0 256
-             0 256
+             0 128
              0 1];
 L = size(structure, 1);
 W = cell(L-1, 1);
@@ -49,6 +49,9 @@ end
 for t=1:epochs
     ind = randperm(trainSize);
     y = zeros(1, mini_batch);
+    if t == epochs / 2
+        alpha = alpha / 2;
+    end
     for k=1:ceil(trainSize/mini_batch)
         % first layer of internal input : zeroes
         Z{1} = zeros(structure(1,2), mini_batch);
@@ -62,7 +65,7 @@ for t=1:epochs
         for l=1:L
             % no dropout on input layer
             if l == 1
-                %DROP{l} = binornd(1, 0.9, [sum(structure(l, :)), mini_batch]) ./ 0.9;
+                %DROP{l} = binornd(1, 0.95, [sum(structure(l, :)), mini_batch]) ./ 0.95;
                 DROP{l} = ones(sum(structure(l, :)), mini_batch);
             % no dropout on output layer
             elseif l == L
